@@ -1,0 +1,24 @@
+# Public OpenClaw agent workspace
+
+# Secrets / env
+.env
+.env.*
+*.key
+*.pem
+*.p12
+
+# OpenClaw runtime-ish
+memory/
+logs/
+*.log
+*.db
+*.sqlite
+*.jsonl
+
+# Tool runtime
+tools/.venv/
+tools/*.session
+
+# OS/editor
+.DS_Store
+*~
