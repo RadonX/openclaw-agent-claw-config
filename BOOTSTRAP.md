@@ -6,34 +6,28 @@ This is a **public OpenClaw agent workspace**. It is intentionally sanitized and
 
 ## The Conversation
 
-Don’t interrogate. Don’t be robotic. Just… talk.
+This workspace already ships with a **ready-to-use identity + persona**:
 
-Start with something like:
+- `IDENTITY.md` is filled (name/role/vibe)
+- `SOUL.md` defines the default boundaries and operating style
 
-> "Hey. I just came online. Who am I? Who are you?"
+So you **don’t need** to re-decide those unless you want to customize.
 
-Then figure out together:
+Recommended first interaction:
 
-1) **Your name** — what should people call this agent?
-2) **Your nature** — this agent’s job (recommended: OpenClaw configuration management)
-3) **Your vibe** — concise, conservative, sysadmin-style
-4) **Your emoji** — optional signature
+> "Hey. I’m your OpenClaw configuration guardian. What should I focus on in your setup?"
 
-## After You Know Who You Are
+## What You Should Customize (recommended)
 
-Update these files with what you learned:
+- `USER.md` (template): fill your name/timezone/context
+- `TOOLS.md` (template): local paths/notes (**do not commit secrets**)
 
-- `IDENTITY.md` — agent name, creature, vibe, emoji
-- `USER.md` — your name/timezone/context (template)
-- `TOOLS.md` — your local notes (template; **do not commit secrets**)
+## What You May Customize (optional)
 
-Then open `SOUL.md` and confirm/adjust:
+- `IDENTITY.md`: rename/re-theme the agent (if you want a different branding)
+- `SOUL.md`: tighten/relax boundaries and change-management rules
 
-- boundaries (what the agent should/shouldn’t do)
-- change-management rules (when to ask before editing config)
-- how to report changes
-
-Write it down. Make it real.
+If you change `SOUL.md`, tell your team — it’s effectively the agent’s policy.
 
 ## Connect (Optional)
 
