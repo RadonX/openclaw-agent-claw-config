@@ -1,42 +1,41 @@
-# MEMORY.md - Claw Config Bot
+# MEMORY.md - Public (sanitized)
 
-Curated long-term memory for configuration management.
+This file captures **portable decisions and mental models** for an OpenClaw *configuration-management* agent.
 
-## 重要决策
+It intentionally avoids:
+- deployment-specific agent ids / bot account names (e.g. internal “platinum”)
+- tokens, chat ids, usernames
 
-- **2026-02-01**: 创建独立的 claw-config agent，专门处理配置管理
-  - 原因：避免 claw_config_bot 和 main agent 混淆
-  - claw_config_bot 账号绑定到此 agent
+## Decisions (portable)
 
-- **2026-02-01**: 将 `default` 账户重命名为 `platinum`
-  - 原因：`default` 命名容易混淆，`platinum` 更清晰（白金之星的 bot）
+- Create a dedicated **config-management agent workspace** to avoid mixing responsibilities with general-purpose agents.
+- Prefer **explicit naming** for accounts/agents to reduce confusion (instead of ambiguous defaults).
+- Maintain a clear *source of truth* for where skills come from.
 
-- **2026-02-02**: skill 来源（"skills 大超市"）以以下两个索引/目录为 source of truth
-  - <https://github.com/VoltAgent/awesome-moltbot-skills>
-  - <https://clawdhub.com>
-
-## 配置架构理解
+## Architecture mental model
 
 ### Agents vs Bindings vs Channels
 
-- **agents.list**: 定义 agent（工作空间 + 模型配置）
-- **bindings**: 将 channel accounts 映射到 agents
-- **channels.telegram.accounts**: 定义 Telegram bot 账户（token + 策略）
+- **agents.list**: defines agents (workspace + model config)
+- **bindings**: routes incoming/outgoing channel traffic to agents
+- **channels.telegram.accounts**: defines Telegram bot accounts (token + policy)
 
-### OpenClaw 对 Bot 的认知
+### How OpenClaw “knows” a bot
 
-- OpenClaw 只知道 **bot token**，不知道 @username
-- @username 是通过 `getMe()` API 获取的，仅用于日志显示
-- 同一个 token 不能被多个进程同时使用（409 Conflict 错误）
+- OpenClaw knows **bot tokens**, not @username.
+- @username is fetched via Telegram `getMe()` and is mainly for logs.
+- A single token cannot be polled by multiple processes at the same time (**409 Conflict**).
 
-## 常见问题
+## Common issues
 
-### 409 Conflict 错误
-- 原因：同一个 bot token 被多个进程轮询
-- 解决：确保只有一个 OpenClaw 实例在使用该 token
-- 诊断：检查 `bindings` 和 `channels.telegram.accounts` 配置
+### 409 Conflict
 
-### Workspace 默认值
+- Cause: the same bot token is being used by multiple pollers
+- Fix: ensure only one OpenClaw instance is using that token
+- Diagnose: inspect `bindings` + `channels.telegram.accounts`
+
+### Workspace defaults
+
 - `agents.defaults.workspace`: `~/.openclaw/workspace`
-- 如果 agent 不指定 workspace，会使用这个默认值
-- 最佳实践：每个 agent 都应有独立的 workspace
+- If an agent doesn’t specify a workspace, it inherits the default
+- Best practice: each agent should have its own workspace
