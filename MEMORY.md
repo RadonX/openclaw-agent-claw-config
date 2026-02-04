@@ -28,6 +28,20 @@ It intentionally avoids:
 
 ## Common issues
 
+### “Why is this agent speaking with the wrong persona?” (session + group systemPrompt gotchas)
+
+Portable mental model:
+
+- Persona comes from **workspace bootstrap files** (e.g. `SOUL.md`, `AGENTS.md`, `IDENTITY.md`, `USER.md`).
+- However, providers can also inject **group-scoped `systemPrompt`** (e.g. `channels.telegram.groups.<id>.systemPrompt` or per-account group config).
+- If a group `systemPrompt` is too specific, it can **override the intended workspace persona** for that room/topic.
+
+Practical guideline:
+- Keep group `systemPrompt` minimal (e.g. “You are in <group name>”) and put detailed behavior in the agent workspace.
+- If you’re testing a “fresh bootstrap”, remember that **sessions are sticky**: an existing session may keep old system messages.
+  - For a truly fresh test, clear the relevant session (or start a new session) after changing persona/config.
+
+
 ### 409 Conflict
 
 - Cause: the same bot token is being used by multiple pollers

@@ -42,7 +42,7 @@ openclaw logs --limit 200 --plain
 
 **方法 2：直接看 log 文件**
 ```bash
-tail -500 ~/.openclaw/logs/gateway.log | grep -E "(chatId|title|migrated)"
+tail -500 ~/.openclaw/logs/gateway.log | grep -E "(chatId|title|migrated|not-allowed)"
 ```
 
 你要找的关键信息一般长这样：
@@ -164,9 +164,18 @@ cat ~/.openclaw/agents/main/sessions/sessions.json | jq -r 'keys[]' | grep "tele
 - [ ] Topics 群：我发/我看的是否同一个 topic
 - [ ] gateway logs 里能否看到 chatId/title（包括 `Group migrated` 消息）
 - [ ] 是否出现 `reason=not-allowed`
-- [ ] `openclaw.json` 里是否把该 `chat_id` 加进 `channels.telegram.groups`
+- [ ] `openclaw.json` 里是否把该 `chat_id` 加进 `channels.telegram.groups`（或 per-account groups）
 - [ ] 是否需要 `bindings` 固定路由到 main / tg-botbot
 - [ ] 重启 gateway 后再验证一次（logs + sessions.json）
+
+### 可选：变更后让 bot 在群里“自报到”一条
+
+当你完成 allowlist/binding/requireMention 等变更，并准备向用户汇报进度时，可以加一个 **可选步骤**：
+
+- 先问一句：**“要不要我让 bot 在目标群里发一条确认消息？”**
+- 如果用户确认，就用 message tool 让对应账号在目标群/Topic 里发一条“已进驻/已生效/当前策略”的短消息。
+
+这样用户不需要翻 logs，就能直接在群里看到变更是否生效。
 
 ---
 
