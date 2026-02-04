@@ -1,5 +1,7 @@
 # openclaw-agent-claw-config
 
+中文 | [English](./README.en.md)
+
 这是一个**公开的、已脱敏的 OpenClaw Agent Workspace**，专门用于 **OpenClaw 配置管理**。
 
 用途：你可以把它当作一个“可直接接入 OpenClaw 的现成工作区（Workspace）”，用来创建一个**隔离的 agent**（独立 sessions/记忆/人设文件）。
@@ -93,15 +95,17 @@ pnpm openclaw channels status --probe --timeout 20000
 
 然后在目标 chat（DM/群/topic）里发一条测试消息，确认路由生效。
 
-## 本地化定制（不要把敏感信息提交到 git）
+## Bootstrap / 本地化定制（OpenClaw 框架里的正确用法）
 
-- 根据你的环境修改 `USER.md`、`TOOLS.md`。
-- secrets（bot token / API key）请放在 **`~/.openclaw/openclaw.json`** 或本地 env 文件里（不要提交）。
+这个 workspace 自带 `BOOTSTRAP.md`，用于 **首次运行的一次性引导（ritual）**。
 
-## 关于 `BOOTSTRAP.md`
+推荐流程是：
+- 先把 agent 接入并开始对话（发一条消息触发首次 session）。
+- 按 `BOOTSTRAP.md` 的引导完成“自我设定”。
+- 引导会让你逐步完善/更新 `IDENTITY.md`、`USER.md`、`SOUL.md` 等文件。
+- 完成后建议删除 `BOOTSTRAP.md`，避免以后重复触发。
 
-- `BOOTSTRAP.md` 是“新 workspace 的一次性引导”。
-- 完成引导后建议删除它，避免以后重复触发。
+**敏感信息**（bot token / API key）请只放在 **`~/.openclaw/openclaw.json`** 或本地 env 文件里，不要提交到 git。
 
 ## 安全与脱敏说明
 
@@ -111,20 +115,3 @@ pnpm openclaw channels status --probe --timeout 20000
 - 设备标识、账号 id
 - 作者机器的真实用户名/绝对路径
 - runtime 产物（sessions/log/db）
-
----
-
-## English (summary)
-
-This is a **public, sanitized OpenClaw agent workspace** for **OpenClaw configuration management**.
-
-Use it by copying/cloning into `~/.openclaw/workspace-...`, then:
-1) Create an isolated agent via `openclaw agents add ... --workspace ...`
-2) Add a `bindings` rule in `~/.openclaw/openclaw.json`
-3) Restart the gateway and verify.
-
-Docs:
-- https://docs.openclaw.ai/concepts/agent-workspace
-- https://docs.openclaw.ai/concepts/multi-agent
-- https://docs.openclaw.ai/cli/agents
-- https://docs.openclaw.ai/start/onboarding
