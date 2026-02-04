@@ -23,7 +23,7 @@ $EDITOR .env   # set TG_TOKEN=...
 
 # Option 3) read token from OpenClaw config (default: ~/.openclaw/openclaw.json)
 ./tg-topic-ping.mjs \
-  --account platinum \
+  --account <accountId> \
   --chat -1001234567890 \
   --topics 66,80,97,145 \
   --text "/status" \

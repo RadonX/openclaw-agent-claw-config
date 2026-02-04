@@ -8,7 +8,7 @@
  * Usage:
  *   TG_TOKEN=xxxx node tg-topic-ping.mjs --chat -100123 --topics 66,80 --text "/status"
  *   TG_TOKEN=xxxx ./tg-topic-ping.mjs --chat -100123 --topics 66 --text "ping" --silent
- *   ./tg-topic-ping.mjs --account platinum --chat -100123 --topics 66,80 --text "/status"
+ *   ./tg-topic-ping.mjs --account <accountId> --chat -100123 --topics 66,80 --text "/status"
  *
  * Notes:
  * - chat_id for supergroups is usually -100...

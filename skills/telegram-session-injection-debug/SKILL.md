@@ -24,7 +24,7 @@ Even if **you** (some agent) created the content, the visible Telegram sender is
 Typical co-existing sessions in the same topic:
 - `agent:claw-config:telegram:group:-100…:topic:279` → `accountId: claw_config_bot`
 - `agent:ginmoni:telegram:group:-100…:topic:279` → `accountId: ginmoni`
-- `telegram:group:-100…:topic:279` → usually a default account (often `platinum`)
+- `telegram:group:-100…:topic:279` → usually a default account (depends on your config)
 
 Rule of thumb: **message is “to” the sessionKey, not “to” an agent**.
 

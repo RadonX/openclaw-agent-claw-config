@@ -3,7 +3,7 @@
 This file captures **portable decisions and mental models** for an OpenClaw *configuration-management* agent.
 
 It intentionally avoids:
-- deployment-specific agent ids / bot account names (e.g. internal “platinum”)
+- deployment-specific agent ids / bot account names (use generic placeholders)
 - tokens, chat ids, usernames
 
 ## Decisions (portable)

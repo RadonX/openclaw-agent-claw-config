@@ -9,7 +9,7 @@ Use this file for **your own local notes** (hostnames, paths, tokens, etc.).
 ## Telegram Bot Accounts (fill locally; do not commit)
 
 - **claw_config_bot**: `<BOT_TOKEN>`
-- **platinum**: `<BOT_TOKEN>`
+- **bot_2**: `<BOT_TOKEN>`
 - **ginmoni**: `<BOT_TOKEN>`
 
 ## OpenClaw Paths (adjust to your machine)
