@@ -11,7 +11,7 @@ Bot token is resolved from `~/.openclaw/openclaw.json` using `--account <account
 ### Create topics
 
 ```bash
-python3 skills/telegram-kit/scripts/tg_bot.py create-topics \
+uv run scripts/tg_bot.py create-topics \
   --account claw_3po \
   --chat -100... \
   --names "Decision,Maxim,Pipeline"
@@ -23,7 +23,7 @@ Outputs:
 ### Send message to a topic
 
 ```bash
-python3 skills/telegram-kit/scripts/tg_bot.py send \
+uv run scripts/tg_bot.py send \
   --account claw_3po \
   --chat -100... \
   --topic 6 \

@@ -22,7 +22,7 @@ Read from `~/.openclaw/.env`:
 ### Create a supergroup (optionally enable forum)
 
 ```bash
-python3 skills/telegram-kit/scripts/tg_user.py create-group \
+uv run scripts/tg_user.py create-group \
   --title "Pensieve · Loop Lab" \
   --about "Decision / Maxim / Pipeline" \
   --forum
@@ -34,13 +34,13 @@ Outputs:
 ### Invite a bot
 
 ```bash
-python3 skills/telegram-kit/scripts/tg_user.py invite-bot --chat -100... --bot @Claw3PObot
+uv run scripts/tg_user.py invite-bot --chat -100... --bot @Claw3PObot
 ```
 
 ### Promote bot to admin (recommended)
 
 ```bash
-python3 skills/telegram-kit/scripts/tg_user.py promote-bot --chat -100... --bot @Claw3PObot
+uv run scripts/tg_user.py promote-bot --chat -100... --bot @Claw3PObot
 ```
 
 ## Notes
