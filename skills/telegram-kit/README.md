@@ -14,10 +14,26 @@ It is intentionally split into **two surfaces**:
   - `~/.openclaw/.env` (Telethon user creds)
   - `~/.openclaw/openclaw.json` (bot token, resolved by `accountId`)
 
-## Requirements
+## Configuration
 
-- `uv`
-- Python (uv will manage an isolated venv)
+### Bot API Token (`openclaw.json`)
+
+Bot API operations require a bot token. The scripts resolve this from `~/.openclaw/openclaw.json` using the `--account <account_id>` argument.
+
+### User API Credentials (`~/.openclaw/.env`)
+
+MTProto user API operations (`tg_user.py`) require credentials for a real Telegram user account. Create a file at `~/.openclaw/.env` with the following:
+
+```dotenv
+# Get from my.telegram.org -> API development tools
+TG_API_ID=12345678
+TG_API_HASH=0123456789abcdef0123456789abcdef
+
+# Your phone number in international format
+TG_PHONE=+14155552671
+```
+
+**Note:** The first time you run `tg_user.py`, Telethon will prompt for a login code and 2FA password in the terminal. It will create a `.session` file to stay logged in.
 
 ## Quick start
 
