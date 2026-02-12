@@ -25,10 +25,22 @@ def create_forum_topic(*, token: str, chat_id: str, name: str, icon_color: Optio
     })
 
 
-def send_message(*, token: str, chat_id: str, text: str, message_thread_id: Optional[int] = None) -> Dict[str, Any]:
+def send_message(
+    *,
+    token: str,
+    chat_id: str,
+    text: str,
+    message_thread_id: Optional[int] = None,
+    disable_notification: bool = False,
+) -> Dict[str, Any]:
     return bot_api_post(token=token, method="sendMessage", data={
         "chat_id": chat_id,
         "text": text,
         "message_thread_id": message_thread_id,
         "disable_web_page_preview": True,
+        "disable_notification": disable_notification if disable_notification else None,
     })
+
+
+def get_chat(*, token: str, chat_id: str) -> Dict[str, Any]:
+    return bot_api_post(token=token, method="getChat", data={"chat_id": chat_id})
