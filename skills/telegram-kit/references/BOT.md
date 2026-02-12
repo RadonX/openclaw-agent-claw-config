@@ -12,7 +12,7 @@ Bot token is resolved from `~/.openclaw/openclaw.json` using `--account <account
 
 ```bash
 uv run scripts/tg_bot.py create-topics \
-  --account claw_3po \
+  --account <account_id> \
   --chat -100... \
   --names "Decision,Maxim,Pipeline"
 ```
@@ -24,11 +24,52 @@ Outputs:
 
 ```bash
 uv run scripts/tg_bot.py send \
-  --account claw_3po \
+  --account <account_id> \
   --chat -100... \
   --topic 6 \
-  --text "Hello"
+  --text "Hello" \
+  --silent  # optional: no notification
 ```
+
+### Ping topics (validate bot permissions)
+
+Send probe messages to multiple topics at once:
+
+```bash
+uv run scripts/tg_bot.py ping-topics \
+  --account <account_id> \
+  --chat -100... \
+  --topics 66,80,97,145 \
+  --text "/status" \
+  --silent
+```
+
+Outputs:
+- `[OK] topic=66 message_id=123`
+- `[FAIL] topic=80 <error>`
+
+Options:
+- `--delay-ms <n>`: delay between topics (default: 350)
+
+### Get chat info
+
+```bash
+uv run scripts/tg_bot.py get-chat \
+  --account <account_id> \
+  --chat -100...
+
+# JSON output
+uv run scripts/tg_bot.py get-chat \
+  --account <account_id> \
+  --chat -100... \
+  --json
+```
+
+Outputs:
+- `id: -100...`
+- `type: supergroup`
+- `title: Group Name`
+- `is_forum: true`
 
 ## Prereqs
 
