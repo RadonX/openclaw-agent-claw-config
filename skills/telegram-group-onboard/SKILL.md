@@ -198,11 +198,14 @@ grep -r "<your bot name>" ~/.openclaw/logs/
 
 ### 可选工具：Bot API Topic Ping
 
-用 Bot API 验证 bot 能否在某个 topic 发言：
+用 Bot API 验证 bot 能否在某个 topic 发言（使用 `telegram-kit` skill）：
 
 ```bash
-# 使用本 skill 的脚本
-node scripts/tg-topic-ping.mjs <bot_token> <chat_id> <topic_id> "test message"
+# 使用 telegram-kit 工具
+../telegram-kit/bin/tg-topic-ping --account <account_id> --chat -100XXXXXXXXXX --topics 66,80 --text "/status"
+
+# 或获取 chat 信息
+../telegram-kit/bin/tg-get-chat --account <account_id> --chat -100XXXXXXXXXX
 ```
 
-详见 `scripts/README-tg-topic-ping.md`。
+详见 [`telegram-kit` skill](../telegram-kit/SKILL.md)。

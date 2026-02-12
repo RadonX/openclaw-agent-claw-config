@@ -1,0 +1,84 @@
+#!/usr/bin/env node
+/**
+ * tg-get-chat - Get Telegram chat info
+ * 
+ * Do one thing well: retrieve and display chat metadata.
+ * 
+ * Usage:
+ *   tg-get-chat --chat -100xxx
+ *   tg-get-chat --account platinum --chat -100xxx
+ */
+
+import { resolveToken, getChat } from '../lib/telegram.mjs';
+
+const args = process.argv.slice(2);
+
+function getArg(name, { required = false, defaultValue = undefined } = {}) {
+  const i = args.indexOf(name);
+  if (i === -1) {
+    if (required) {
+      console.error(`ERROR: missing required arg: ${name}`);
+      process.exit(2);
+    }
+    return defaultValue;
+  }
+  const v = args[i + 1];
+  if (!v || v.startsWith('--')) {
+    console.error(`ERROR: missing value for arg: ${name}`);
+    process.exit(2);
+  }
+  return v;
+}
+
+function hasFlag(name) {
+  return args.includes(name);
+}
+
+if (hasFlag('--help') || hasFlag('-h')) {
+  console.log(`
+tg-get-chat - Get Telegram chat info
+
+Usage:
+  tg-get-chat --chat <chat_id>
+
+Options:
+  --chat <id>       Chat id to query
+  --account <id>    Load token from OpenClaw config by account id
+  --token <token>   Explicit bot token (or use TG_TOKEN env)
+  --json            Output raw JSON
+  --help            Show this help
+`);
+  process.exit(0);
+}
+
+const chat = getArg('--chat', { required: true });
+const accountId = getArg('--account');
+const explicitToken = getArg('--token');
+const configPath = getArg('--config');
+const jsonOutput = hasFlag('--json');
+
+const token = resolveToken({ token: explicitToken, accountId, configPath });
+if (!token) {
+  console.error('ERROR: no token found');
+  process.exit(2);
+}
+
+(async () => {
+  const result = await getChat(token, chat);
+  
+  if (!result.ok) {
+    console.error(`ERROR: ${result.error}`);
+    process.exit(1);
+  }
+  
+  if (jsonOutput) {
+    console.log(JSON.stringify(result.chat, null, 2));
+  } else {
+    const c = result.chat;
+    console.log(`id: ${c.id}`);
+    console.log(`type: ${c.type}`);
+    console.log(`title: ${c.title || '(none)'}`);
+    if (c.username) console.log(`username: @${c.username}`);
+    if (c.is_forum) console.log(`is_forum: true`);
+  }
+})();

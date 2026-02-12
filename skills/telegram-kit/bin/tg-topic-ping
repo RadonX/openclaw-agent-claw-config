@@ -1,0 +1,125 @@
+#!/usr/bin/env node
+/**
+ * tg-topic-ping - Send probe messages to Telegram forum topics
+ * 
+ * Do one thing well: validate bot can post to specific topics.
+ * 
+ * Usage:
+ *   tg-topic-ping --chat -100xxx --topics 66,80 --text "/status"
+ *   tg-topic-ping --account platinum --chat -100xxx --topics 66 --text "ping" --silent
+ */
+
+import { resolveToken, sendMessage } from '../lib/telegram.mjs';
+
+// Simple arg parser
+const args = process.argv.slice(2);
+
+function getArg(name, { required = false, defaultValue = undefined } = {}) {
+  const i = args.indexOf(name);
+  if (i === -1) {
+    if (required) {
+      console.error(`ERROR: missing required arg: ${name}`);
+      process.exit(2);
+    }
+    return defaultValue;
+  }
+  const v = args[i + 1];
+  if (!v || v.startsWith('--')) {
+    console.error(`ERROR: missing value for arg: ${name}`);
+    process.exit(2);
+  }
+  return v;
+}
+
+function hasFlag(name) {
+  return args.includes(name);
+}
+
+if (hasFlag('--help') || hasFlag('-h')) {
+  console.log(`
+tg-topic-ping - Send probe messages to Telegram forum topics
+
+Usage:
+  tg-topic-ping --chat <chat_id> --topics <id1,id2,...> --text <message>
+
+Options:
+  --chat <id>       Supergroup chat_id (usually -100...)
+  --topics <ids>    Comma-separated topic ids (message_thread_id)
+  --text <msg>      Message body to send
+  --account <id>    Load token from OpenClaw config by account id
+  --token <token>   Explicit bot token (or use TG_TOKEN env)
+  --silent          Send without notification
+  --delay-ms <n>    Delay between topics (default: 350)
+  --parse-mode <m>  MarkdownV2|HTML|Markdown (default: none)
+  --help            Show this help
+
+Exit codes:
+  0  All topics sent OK
+  1  At least one topic failed
+  2  Invalid args/env
+`);
+  process.exit(0);
+}
+
+// Parse args
+const chat = getArg('--chat', { required: true });
+const topicsRaw = getArg('--topics', { required: true });
+const text = getArg('--text', { required: true });
+const accountId = getArg('--account');
+const explicitToken = getArg('--token');
+const configPath = getArg('--config');
+const delayMs = Number(getArg('--delay-ms', { defaultValue: '350' }));
+const parseMode = getArg('--parse-mode');
+const silent = hasFlag('--silent');
+
+// Resolve token
+const token = resolveToken({ token: explicitToken, accountId, configPath });
+if (!token) {
+  console.error('ERROR: no token found. Provide via:');
+  console.error('  --token <token>');
+  console.error('  --account <id> (reads from ~/.openclaw/openclaw.json)');
+  console.error('  TG_TOKEN or TELEGRAM_BOT_TOKEN env var');
+  process.exit(2);
+}
+
+// Parse topics
+const topics = topicsRaw
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean)
+  .map(Number)
+  .filter(n => Number.isFinite(n));
+
+if (topics.length === 0) {
+  console.error('ERROR: --topics must contain at least one numeric topic id');
+  process.exit(2);
+}
+
+// Send to each topic
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+(async () => {
+  let failed = 0;
+  
+  for (let i = 0; i < topics.length; i++) {
+    const topicId = topics[i];
+    const result = await sendMessage(token, {
+      chatId: chat,
+      threadId: topicId,
+      text,
+      parseMode,
+      silent,
+    });
+    
+    if (result.ok) {
+      console.log(`[OK] topic=${topicId} message_id=${result.messageId}`);
+    } else {
+      console.log(`[FAIL] topic=${topicId} ${result.error}`);
+      failed++;
+    }
+    
+    if (i < topics.length - 1) await sleep(delayMs);
+  }
+  
+  process.exit(failed > 0 ? 1 : 0);
+})();

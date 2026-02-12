@@ -1,27 +1,70 @@
 ---
 name: telegram-kit
-description: Telegram provisioning toolkit that unifies a safe, Linus-style workflow for forum supergroups: (A) MTProto *user* API (high-risk) to create groups, enable forum, invite/promote bots; (B) Telegram Bot API (low-risk) to create forum topics and send messages. Use when setting up a new Telegram supergroup/forum for an OpenClaw agent, or when you need to create topics / verify/manage bot permissions. Strictly separate user vs bot operations.
+description: Telegram Bot API CLI tools. Small, focused utilities for interacting with Telegram bots - token resolution, sending messages, getting chat info. Use when you need to validate bot permissions, send probe messages, or query chat metadata.
 ---
 
-# telegram-kit
+# Telegram Kit
 
-## Safety invariants (do not violate)
+A collection of small, focused CLI tools for Telegram Bot API operations.
 
-- **Hard split:** `user` = MTProto human account (high-risk). `bot` = Bot API token (lower-risk). Never mix.
-- **User API rules:** never run unattended; never schedule; expect login/2FA/code prompts; minimize write actions.
-- **Secrets:** do not store credentials inside this skill. Read from `~/.openclaw/.env` and `~/.openclaw/openclaw.json` only.
+> **Philosophy**: Do one thing well. Composable. No magic.
 
-## Interface (CLI-like subcommands)
+## Tools
 
-- `telegram-kit user …` → read `references/USER.md`
-- `telegram-kit bot  …` → read `references/BOT.md`
-- End-to-end flow → read `references/FLOWS.md`
-- Failures / gotchas → read `references/TROUBLESHOOT.md`
+| Tool | Purpose |
+|------|---------|
+| `bin/tg-topic-ping` | Send probe messages to forum topics |
+| `bin/tg-get-chat` | Get chat info (id, title, type) |
 
-## Implementation notes
+## Shared Library
 
-- Scripts live in `scripts/`:
-  - MTProto (Telethon): `scripts/tg_user.py`
-  - Bot API (stdlib urllib): `scripts/tg_bot.py`
+`lib/telegram.mjs` provides:
+- `resolveToken()` — Multi-source token resolution (env, .env, OpenClaw config)
+- `sendMessage()` — Send message to chat/topic
+- `getChat()` — Get chat metadata
 
-When executing scripts, run them directly (do not copy/paste code into chat).
+## Quick Reference
+
+### tg-topic-ping
+
+Validate bot can post to specific forum topics:
+
+```bash
+# Using env token
+TG_TOKEN=xxx ./bin/tg-topic-ping --chat -100XXXXXXXXXX --topics 66,80 --text "/status"
+
+# Using OpenClaw account
+./bin/tg-topic-ping --account platinum --chat -100XXXXXXXXXX --topics 66,80 --text "ping" --silent
+```
+
+Options:
+- `--chat <id>` — Supergroup chat_id (required)
+- `--topics <ids>` — Comma-separated topic ids (required)
+- `--text <msg>` — Message body (required)
+- `--account <id>` — Load token from OpenClaw config
+- `--token <token>` — Explicit token
+- `--silent` — No notification
+- `--delay-ms <n>` — Delay between topics (default: 350)
+
+### tg-get-chat
+
+Query chat metadata:
+
+```bash
+./bin/tg-get-chat --account platinum --chat -100XXXXXXXXXX
+./bin/tg-get-chat --account platinum --chat -100XXXXXXXXXX --json
+```
+
+## Token Resolution
+
+Tools resolve tokens in this order:
+1. `--token <token>` explicit arg
+2. `TG_TOKEN` or `TELEGRAM_BOT_TOKEN` env var
+3. `.env` file in current directory
+4. OpenClaw config (`~/.openclaw/openclaw.json`) via `--account <id>`
+
+## Exit Codes
+
+- `0` — Success
+- `1` — Operation failed (API error)
+- `2` — Invalid args or missing token
