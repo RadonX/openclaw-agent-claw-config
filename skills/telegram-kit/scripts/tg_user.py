@@ -102,6 +102,76 @@ async def cmd_promote_bot(args: argparse.Namespace) -> int:
     return 0
 
 
+async def cmd_send(args: argparse.Namespace) -> int:
+    """Send message to forum topics as a user (to trigger bot commands)."""
+    from telethon.tl import functions
+    from telethon.tl.types import InputPeerChannel
+    import time
+
+    client, phone, password = connect_client(session_path=args.session)
+    async with client:
+        await ensure_login(client, phone, password)
+
+        chat_id = int(args.chat)
+        entity = await client.get_entity(chat_id)
+
+        # Build message text
+        msg_text = f"{args.mention} {args.text}" if args.mention else args.text
+
+        # If no topic specified, send to main chat
+        if not args.topics:
+            sent = await client.send_message(entity, msg_text)
+            print(f"[OK] chat={chat_id} sent_message_id={sent.id}")
+            return 0
+
+        # Parse topics
+        topics = [int(t.strip()) for t in args.topics.split(",") if t.strip()]
+
+        # Get InputPeerChannel for forum topics request
+        peer = await client.get_input_entity(entity)
+        if not isinstance(peer, InputPeerChannel):
+            raise RuntimeError("Target chat is not a channel/supergroup")
+
+        # Fetch forum topics to get top_message ids
+        res = await client(
+            functions.messages.GetForumTopicsRequest(
+                peer=peer,
+                offset_date=0,
+                offset_id=0,
+                offset_topic=0,
+                limit=200,
+                q="",
+            )
+        )
+
+        topic_to_top: dict[int, int] = {}
+        for t in res.topics:
+            topic_to_top[int(t.id)] = int(t.top_message)
+
+        missing = [t for t in topics if t not in topic_to_top]
+        if missing:
+            print(f"[WARN] Could not find top_message for topics: {missing}")
+
+        failed = 0
+        for idx, topic_id in enumerate(topics):
+            top_msg = topic_to_top.get(topic_id)
+            if not top_msg:
+                print(f"[SKIP] topic={topic_id} (no top_message found)")
+                failed += 1
+            else:
+                try:
+                    sent = await client.send_message(entity, msg_text, reply_to=top_msg)
+                    print(f"[OK] topic={topic_id} sent_message_id={sent.id}")
+                except Exception as e:
+                    print(f"[FAIL] topic={topic_id} {type(e).__name__}: {e}")
+                    failed += 1
+
+            if idx < len(topics) - 1:
+                time.sleep(args.delay_ms / 1000)
+
+        return 1 if failed else 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="tg_user.py", description="High-risk MTProto user automation (Telethon).")
     p.add_argument(
@@ -128,6 +198,14 @@ def build_parser() -> argparse.ArgumentParser:
     p_p.add_argument("--bot", required=True, help="@BotUsername")
     p_p.add_argument("--rank", default="bot")
     p_p.set_defaults(fn=cmd_promote_bot)
+
+    p_s = sub.add_parser("send", help="Send message as user (to trigger bot commands)")
+    p_s.add_argument("--chat", required=True, help="-100… chat_id")
+    p_s.add_argument("--topics", default="", help="Comma-separated topic ids (optional)")
+    p_s.add_argument("--text", required=True, help="Message text")
+    p_s.add_argument("--mention", default="", help="@BotUsername to mention (optional)")
+    p_s.add_argument("--delay-ms", type=int, default=350, help="Delay between topics")
+    p_s.set_defaults(fn=cmd_send)
 
     return p
 

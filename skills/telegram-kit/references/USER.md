@@ -43,6 +43,29 @@ uv run scripts/tg_user.py invite-bot --chat -100... --bot @Claw3PObot
 uv run scripts/tg_user.py promote-bot --chat -100... --bot @Claw3PObot
 ```
 
+### Send message as user (to trigger bot commands)
+
+Send a message to forum topics as a user. Useful for triggering bot commands like `/status`:
+
+```bash
+# Send to multiple topics
+uv run scripts/tg_user.py send \
+  --chat -100... \
+  --topics 66,80,97 \
+  --text "/status" \
+  --mention @Claw3PObot
+
+# Send to main chat (no topic)
+uv run scripts/tg_user.py send \
+  --chat -100... \
+  --text "Hello"
+```
+
+Options:
+- `--topics`: comma-separated topic ids (optional)
+- `--mention`: @BotUsername to prefix (optional)
+- `--delay-ms`: delay between topics (default: 350)
+
 ## Notes
 
 - Forum enable requires Telethon API that currently needs `tabs` param; the script handles this.

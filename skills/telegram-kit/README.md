@@ -30,7 +30,7 @@ TG_API_ID=12345678
 TG_API_HASH=0123456789abcdef0123456789abcdef
 
 # Your phone number in international format
-TG_PHONE=+14155552671
+TG_PHONE=+1XXXXXXXXXX
 ```
 
 **Note:** The first time you run `tg_user.py`, Telethon will prompt for a login code and 2FA password in the terminal. It will create a `.session` file to stay logged in.
