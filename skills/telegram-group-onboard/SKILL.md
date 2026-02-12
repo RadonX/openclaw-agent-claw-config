@@ -195,3 +195,14 @@ cat ~/.openclaw/agents/main/sessions/sessions.json | jq -r 'keys[]' | grep "tele
 ```bash
 grep -r "<your bot name>" ~/.openclaw/logs/
 ```
+
+### 可选工具：Bot API Topic Ping
+
+用 Bot API 验证 bot 能否在某个 topic 发言：
+
+```bash
+# 使用本 skill 的脚本
+node scripts/tg-topic-ping.mjs <bot_token> <chat_id> <topic_id> "test message"
+```
+
+详见 `scripts/README-tg-topic-ping.md`。
