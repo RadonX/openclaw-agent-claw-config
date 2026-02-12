@@ -32,7 +32,7 @@ uv run scripts/tg_user.py --help
 
 ```bash
 uv run scripts/tg_bot.py create-topics \
-  --account claw_3po \
+  --account <account_id> \
   --chat -100... \
   --names "Decision,Maxim,Pipeline"
 ```
