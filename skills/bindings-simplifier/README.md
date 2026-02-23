@@ -1,65 +1,47 @@
 # bindings-simplifier
 
-A **docs-first, safety-first** skill for simplifying OpenClaw `bindings` (routing rules) while preserving behavior.
+When your OpenClaw `bindings` have grown into a tangled mess (per-topic spam, duplicated rules, unclear ownership), this skill helps you **simplify them safely**—without accidentally changing which agent handles which chat.
 
-## Why this exists
+## What you get
 
-Bindings tend to grow into per-topic/per-group redundancy. Simplifying them is high-risk because:
+- Fewer bindings (often 30–60% reduction)
+- A clear “before → after” routing summary
+- A minimal patch you can apply with confidence
+- A short verification checklist so you don’t discover breakage later
 
-- `bindings` controls **routing** (which agent receives a message)
-- `channels.*` controls **activation** (whether the bot replies): `requireMention`, `allowFrom`, `groupPolicy`, per-topic overrides, etc.
+## When you want this
 
-A routing-only refactor can still “break the config” from the user’s perspective if activation differs per topic/group.
+Use it when:
+- you keep adding new groups/topics and `bindings` keeps growing
+- the same agent is bound to many topics in the same group
+- a bot account is dedicated to one agent (good candidate for account-level binding)
+- you want to refactor routing but **cannot afford downtime / mis-routing**
 
-## Mental model (tl;dr)
+## How to use
 
-- **Routing**: `bindings` → peer/topic/account → agent
-- **Activation**: `channels.<provider>` → reply gating
-
-Always preserve **both**.
-
-## Interface
-
+1) Run:
 - `/bindings-simplifier`
-  - Default: run the full workflow in **plan-only** mode (analyze → propose → print a minimal JSON5 patch + verification steps).
-- `/bindings-simplifier help`
-  - Show how it works.
 
-### Apply (follow-up step)
+2) Review the plan (it prints a patch + risks + verification).
 
-After a plan is printed, reply with:
-
+3) If you agree, reply:
 - `apply`
 
-The skill must then re-print the patch, ask for a final yes/no, and only then write config.
+You’ll still get a final confirmation prompt before anything is written.
 
-## Official docs (source of truth)
+## Why this is safer than “just deleting duplicates”
 
-Use a portable repo root variable:
+Routing issues usually come from mixing up two different layers:
 
-- `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/channel-routing.md`
-- `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/telegram.md`
+- **Routing** (`bindings`): decides which agent receives the message.
+- **Activation** (`channels.*`): decides whether the bot replies (e.g. mention required, allowlists, per-topic overrides).
 
-## What the workflow outputs
+This skill forces an explicit check of both so you don’t “successfully refactor bindings” while silently changing reply behavior.
 
-1. **Before coverage map**: what routes where
-2. **After coverage map**: what will route where
-3. **Removed/merged bindings list**
-4. **Minimal JSON5 patch** (copy/paste)
-5. **Verification checklist** + suggested manual tests
+## References (if you need to go deeper)
 
-## Files
-
-- `SKILL.md`: router + guardrails + doc pointers
-- `references/PROCESS.md`: end-to-end method (routing + activation)
-- `references/CHECKLISTS.md`: pre/post-flight checks
-- `references/PATTERNS.md`: safe patterns + anti-patterns
-- `references/HELP.md`: usage notes
-
-## Non-goals
-
-- Not a fully automated refactoring engine.
-- Does not execute `git` / restarts by itself unless explicitly asked and appropriately authorized.
+- Routing rules: `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/channel-routing.md`
+- Telegram activation gates: `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/telegram.md`
 
 ## License
 
