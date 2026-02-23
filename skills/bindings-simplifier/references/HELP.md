@@ -19,10 +19,10 @@ Runs the job in **plan-only** mode:
    - minimal JSON5 patch
    - verification checklist
 
-## Apply mode (`/bindings-simplifier --apply`)
+## Apply (follow-up step)
 
-Still prints the full plan first, then asks for an explicit final confirmation before writing.
-
+After the plan is printed, reply with **`apply`**.
+The skill must re-print the patch, ask for a final yes/no, then apply.
 ## Read first (official docs)
 
 - Routing: `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/channel-routing.md`

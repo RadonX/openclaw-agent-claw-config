@@ -21,18 +21,25 @@ This skill is about **routing** (`bindings`) simplification with **consistency g
 ## Interface
 
 - `/bindings-simplifier`
-  - Default behavior: **do the binding job** (analyze → propose a safe simplification plan) and print a patch.
+  - Default behavior (**plan-only**): do the binding job (analyze → propose a safe simplification plan) and print a minimal JSON5 patch.
 - `/bindings-simplifier help`
   - Show how it works + what to verify.
-- `/bindings-simplifier --apply`
-  - Apply the proposed patch **after** printing it and getting explicit confirmation.
+
+### Apply (follow-up step, not a subcommand)
+
+After the plan is printed, the user can reply with **`apply`** (or “apply it”) to proceed.
+The skill must then:
+1) re-print the exact patch it is about to apply
+2) ask for a final explicit confirmation (yes/no)
+3) only then write the config and request a gateway restart if needed
 
 ## Hard parsing rules
 
-- If no args: run the default workflow (plan-only).
+- If no args: run default workflow (plan-only).
 - If `help`: show help.
-- If `--apply`: must still show the full proposal + ask for a final “yes, apply” before writing.
 - Any other args: show help.
+
+Apply is triggered only by a follow-up user message (`apply`) after a plan was produced.
 
 ## Which official docs to consult (source-of-truth)
 
@@ -60,7 +67,7 @@ If there is a mismatch between expectations and behavior: **docs first, then sou
   2) after coverage map
   3) a minimal patch (JSON5 snippet)
   4) verification steps
-- **Apply is gated**: `--apply` is never implicit; it must ask for final confirmation.
+- **Apply is gated**: apply is never implicit; it must ask for final confirmation.
 
 ## What this skill produces
 
@@ -87,4 +94,5 @@ A safe simplification proposal containing:
 
 - Always read: `references/PROCESS.md`
 - For checklists: `references/CHECKLISTS.md`
-- For examples: `references/PATTERNS.md`
+- For patterns/examples: `references/PATTERNS.md`
+- For usage: `references/HELP.md`
