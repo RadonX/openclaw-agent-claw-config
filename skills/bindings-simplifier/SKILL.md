@@ -1,132 +1,83 @@
 ---
 name: bindings-simplifier
-description: Simplify OpenClaw bindings configuration by eliminating redundancy while preserving functionality. Use when: (1) bindings have grown too large, (2) there are repetitive per-topic bindings, (3) an account is only used by one agent. Triggered by requests like "simplify bindings", "reduce binding count", or "clean up redundant topic bindings".
+description: Safely simplify OpenClaw `bindings` (routing rules) while preserving behavior. Use when bindings are redundant (per-topic spam), when accounts are exclusive to a single agent, or when you need to reduce binding count without breaking routing/activation.
+compatibility: OpenClaw JSON5 config.
 metadata:
-  author: RadonX
-  version: "1.0"
+  author: claw-config
+  version: "2.0"
   openclaw:
-    emoji: "📦"
+    emoji: "🧭"
 ---
 
 # bindings-simplifier
 
-Simplify OpenClaw `bindings` configuration by eliminating redundancy while ensuring functional consistency.
+This skill is about **routing** (`bindings`) simplification with **consistency guarantees**.
+
+> Mental model first:
+> - `bindings` decides **which agent** receives an inbound message.
+> - `channels.*` decides **whether** the bot is allowed/activated to reply (requireMention, allowFrom, groupPolicy, dmPolicy...).
+> - You can simplify routing perfectly and still “break” behavior if activation gates differ per topic/group.
 
 ## Interface
 
-```
-/bindings-simplifier [--dry-run] [--show-changes]
-```
+- `/bindings-simplifier help`
+- `/bindings-simplifier propose [--scope telegram|all] [--target-account <accountId>]`
+- `/bindings-simplifier audit [--scope telegram|all]`
 
-- `--dry-run`: Show proposed changes without writing
-- `--show-changes`: Display before/after comparison
+Default: **proposal-only**. Never writes config automatically.
 
-## When to use
+## Hard parsing rules
 
-Use when:
-- Bindings have grown too large (>30 entries)
-- There are repetitive per-topic bindings for the same agent
-- An account (`accountId`) is only used by one agent
-- Multiple agents bind to the same group with similar patterns
+- First token after `/bindings-simplifier` must be one of:
+  - `help` | `audit` | `propose`
+- Unknown tokens → show help and ask the user to restate.
 
-Do NOT use when:
-- Each binding has unique, non-mergeable logic
-- Account is shared across multiple agents with complex routing
-- Unsure about activation implications
+## Which official docs to consult (source-of-truth)
 
-## Core simplification strategies
+When solving deep routing/consistency issues, read these first (in order):
 
-### 1) Account-level bindings
+1. **Routing priority + session key shapes**
+   - `~/repo/apps/openclaw/docs/channels/channel-routing.md`
 
-Use when an `accountId` maps to only one agent:
+2. **Telegram activation gates (requireMention, allowFrom, groupPolicy, topics overrides)**
+   - `~/repo/apps/openclaw/docs/channels/telegram.md`
 
-**Before** (redundant):
-```json5
-{ agentId: "claw-config", match: { channel: "telegram", accountId: "claw_3po", peer: { id: "-1003792208107" }}},
-{ agentId: "claw-config", match: { channel: "telegram", accountId: "claw_3po", peer: { id: "-1003593489589" }}},
-{ agentId: "claw-config", match: { channel: "telegram", accountId: "claw_3po", peer: { id: "-1003797724681" }}},
-```
+3. **Gateway config patterns / gotchas** (when unsure where a setting lives)
+   - `~/repo/apps/openclaw/docs/gateway/configuration.md` (if present in your version)
 
-**After** (simplified):
-```json5
-{ agentId: "claw-config", match: { channel: "telegram", accountId: "claw_3po" }},
-```
+If there is a mismatch between expectations and behavior: **docs first, then source grep**.
 
-**Verification**: Check that the `accountId` appears in no other agent's bindings.
+## Guardrails (non-negotiable)
 
-### 2) Merge topic-level bindings
+- **Consistency > reduction**: do not delete/merge a binding unless you can explain why behavior remains identical.
+- **Separate routing from activation**: always audit `channels.<provider>` gates for the same peers you simplify.
+- **Account-level binding only when exclusive**: convert to account-level only if that `accountId` routes to exactly one agent *or* you keep explicit peer exceptions.
+- **Keep exception topics explicit**: if a topic has different activation or different agent, keep a dedicated binding.
+- **Proposal-first**: output “before → after” mapping + risk list before applying changes.
 
-When multiple topics for the same group map to the same agent:
+## What this skill produces
 
-**Before** (redundant):
-```json5
-{ agentId: "agent", match: { channel: "telegram", accountId: "bot", peer: { id: "-1003795580197:topic:66" }}},
-{ agentId: "agent", match: { channel: "telegram", accountId: "bot", peer: { id: "-1003795580197:topic:80" }}},
-{ agentId: "agent", match: { channel: "telegram", accountId: "bot", peer: { id: "-1003795580197:topic:97" }}},
-```
+A safe simplification proposal containing:
 
-**After** (merged):
-```json5
-{ agentId: "agent", match: { channel: "telegram", accountId: "bot", peer: { id: "-1003795580197" }}},
-```
+1. **Coverage map** (before): which peers/topics/accounts are handled by which agent
+2. **Proposed bindings** (after)
+3. **Diff summary**: removed/merged bindings list
+4. **Consistency checks** to run (routing + activation)
+5. **Focused manual tests** (1–3 high-risk peers)
 
-**Verification**: Ensure activation behavior (`requireMention`, `allowFrom`) is consistent across topics. See `references/AUDIT.md`.
+## Routing simplification patterns (high-signal)
 
-### 3) Preserve exception topics
+- **Account exclusive → account-level binding**
+  - Example: `claw_3po` is only used by `claw-config` → keep one account-level binding.
 
-When a single topic needs special handling, keep it explicit:
+- **Same agent across many topics → merge to group-level**
+  - Only if `channels.telegram.groups.<gid>.topics` has no activation overrides that would change behavior.
 
-**Pattern**:
-```json5
-// Group-level binding (covers most topics)
-{ agentId: "default-agent", match: { channel: "telegram", accountId: "bot", peer: { id: "-1003795580197" }}},
+- **One special topic → keep as exception**
+  - Topic-level binding overrides group/account-level.
 
-// Exception topic (different agent)
-{ agentId: "special-agent", match: { channel: "telegram", accountId: "bot", peer: { id: "-1003795580197:topic:218" }}},
-```
+## References
 
-**Verification**: Topic-level bindings have priority over group-level (see `references/PRIORITY.md`).
-
-## Pre-simplification checklist
-
-Before simplifying, verify:
-
-1. **Account exclusivity**: Confirm `accountId` is not shared
-   ```bash
-   jq '.bindings[] | .match.accountId' ~/.openclaw/openclaw.json | sort -u
-   ```
-
-2. **Activation consistency**: Check `channels.telegram.groups.<id>` for:
-   - `requireMention` values
-   - `allowFrom` lists
-   - `topics` with special settings
-
-3. **Backup config**:
-   ```bash
-   cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.backup.$(date +%Y%m%d_%H%M%S)
-   ```
-
-## What references to read
-
-- **Mandatory**: `references/AUDIT.md` (pre-flight checks)
-- **Mandatory**: `references/PRIORITY.md` (binding resolution order)
-- **Optional**: `references/EXAMPLES.md` (common patterns)
-
-## Global guardrails
-
-- **Never** remove a binding without verifying its agent is still reachable
-- **Always** check activation config (`channels.telegram.groups`) before merging topic bindings
-- **Ask** before simplifying when:
-  - A group has `requireMention` or `allowFrom` settings
-  - An account is used by multiple agents
-  - You're unsure about priority implications
-
-## Output proposal
-
-Before writing, show:
-1. Current count vs. proposed count
-2. List of removed bindings (with peer IDs)
-3. Any activation inconsistencies found
-4. Prompt for confirmation: `Apply these changes? [y/N]`
-
-Only write after explicit user confirmation.
+- Always read: `references/PROCESS.md`
+- For checklists: `references/CHECKLISTS.md`
+- For examples: `references/PATTERNS.md`
