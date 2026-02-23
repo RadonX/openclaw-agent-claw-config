@@ -20,14 +20,19 @@ This skill is about **routing** (`bindings`) simplification with **consistency g
 
 ## Interface
 
+- `/bindings-simplifier`
+  - Default behavior: **do the binding job** (analyze → propose a safe simplification plan) and print a patch.
 - `/bindings-simplifier help`
-
-This is a **documentation + checklist** skill (not a CLI tool). It never edits files by itself.
+  - Show how it works + what to verify.
+- `/bindings-simplifier --apply`
+  - Apply the proposed patch **after** printing it and getting explicit confirmation.
 
 ## Hard parsing rules
 
-- First token after `/bindings-simplifier` must be `help`.
-- Unknown tokens → show help.
+- If no args: run the default workflow (plan-only).
+- If `help`: show help.
+- If `--apply`: must still show the full proposal + ask for a final “yes, apply” before writing.
+- Any other args: show help.
 
 ## Which official docs to consult (source-of-truth)
 
@@ -46,11 +51,16 @@ If there is a mismatch between expectations and behavior: **docs first, then sou
 
 ## Guardrails (non-negotiable)
 
-- **Consistency > reduction**: do not delete/merge a binding unless you can explain why behavior remains identical.
+- **Consistency > reduction**: do not delete/merge a binding unless you can show routing equivalence.
 - **Separate routing from activation**: always audit `channels.<provider>` gates for the same peers you simplify.
 - **Account-level binding only when exclusive**: convert to account-level only if that `accountId` routes to exactly one agent *or* you keep explicit peer exceptions.
 - **Keep exception topics explicit**: if a topic has different activation or different agent, keep a dedicated binding.
-- **Proposal-first**: output “before → after” mapping + risk list before applying changes.
+- **Plan-first (always)**: default mode must output:
+  1) before coverage map (what routes where)
+  2) after coverage map
+  3) a minimal patch (JSON5 snippet)
+  4) verification steps
+- **Apply is gated**: `--apply` is never implicit; it must ask for final confirmation.
 
 ## What this skill produces
 
