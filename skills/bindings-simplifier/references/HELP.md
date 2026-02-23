@@ -8,8 +8,8 @@
 
 ## Read first (official docs)
 
-- Routing: `~/repo/apps/openclaw/docs/channels/channel-routing.md`
-- Telegram gates: `~/repo/apps/openclaw/docs/channels/telegram.md`
+- Routing: `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/channel-routing.md`
+- Telegram gates: `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/telegram.md`
 
 ## Next
 

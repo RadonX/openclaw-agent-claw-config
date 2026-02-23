@@ -21,29 +21,26 @@ This skill is about **routing** (`bindings`) simplification with **consistency g
 ## Interface
 
 - `/bindings-simplifier help`
-- `/bindings-simplifier propose [--scope telegram|all] [--target-account <accountId>]`
-- `/bindings-simplifier audit [--scope telegram|all]`
 
-Default: **proposal-only**. Never writes config automatically.
+This is a **documentation + checklist** skill (not a CLI tool). It never edits files by itself.
 
 ## Hard parsing rules
 
-- First token after `/bindings-simplifier` must be one of:
-  - `help` | `audit` | `propose`
-- Unknown tokens → show help and ask the user to restate.
+- First token after `/bindings-simplifier` must be `help`.
+- Unknown tokens → show help.
 
 ## Which official docs to consult (source-of-truth)
 
 When solving deep routing/consistency issues, read these first (in order):
 
 1. **Routing priority + session key shapes**
-   - `~/repo/apps/openclaw/docs/channels/channel-routing.md`
+   - `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/channel-routing.md`
 
 2. **Telegram activation gates (requireMention, allowFrom, groupPolicy, topics overrides)**
-   - `~/repo/apps/openclaw/docs/channels/telegram.md`
+   - `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/telegram.md`
 
 3. **Gateway config patterns / gotchas** (when unsure where a setting lives)
-   - `~/repo/apps/openclaw/docs/gateway/configuration.md` (if present in your version)
+   - `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/gateway/configuration.md` (if present in your version)
 
 If there is a mismatch between expectations and behavior: **docs first, then source grep**.
 

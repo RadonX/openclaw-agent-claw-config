@@ -7,4 +7,4 @@ Use instead:
 - `references/PROCESS.md` (end-to-end method)
 
 If you are debugging routing priority, consult official docs:
-- `~/repo/apps/openclaw/docs/channels/channel-routing.md`
+- `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/channel-routing.md`

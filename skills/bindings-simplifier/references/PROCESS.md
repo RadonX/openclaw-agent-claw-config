@@ -90,7 +90,7 @@ Recommended sequence:
 
 Stop simplifying and switch to docs + source-of-truth:
 
-- Read: `~/repo/apps/openclaw/docs/channels/channel-routing.md`
-- Read: `~/repo/apps/openclaw/docs/channels/telegram.md`
+- Read: `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/channel-routing.md`
+- Read: `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/telegram.md`
 
 Then re-derive the binding priority and activation semantics.
