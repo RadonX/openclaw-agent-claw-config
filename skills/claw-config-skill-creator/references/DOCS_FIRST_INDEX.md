@@ -1,21 +1,29 @@
 # Docs-first index (portable, minimal)
 
-This is a **small set of official entry points**, not an exhaustive list.
+This file is **not** a fixed doc list.
+
+It provides:
+
+- a portable way to reference official docs, and
+- a small set of *optional* entry points you can pick from **based on the skill archetype**.
 
 Use either:
 
 - Hosted docs: https://docs.openclaw.ai
 - Local docs (portable repo root): `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/...`
 
-## The 3 entry points (cover most claw-config deep dives)
+## Entry points (pick what fits; do not copy all)
 
-1) **Routing semantics / session keys**
+### Routing / bindings skills
+
 - `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/channel-routing.md`
 
-2) **Telegram activation gates** (why the bot does / doesn’t reply)
+### Telegram behavior / activation skills
+
 - `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/telegram.md`
 
-3) **Exec policy / approvals / elevated** (why commands are blocked)
+### Exec / approvals / elevated skills
+
 - `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/tools/exec.md`
 - `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/tools/exec-approvals.md`
 - `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/tools/elevated.md`
