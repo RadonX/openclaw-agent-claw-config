@@ -14,16 +14,18 @@ This is the minimal template the creator should instantiate.
     CHECKLISTS.md
 ```
 
-## SKILL.md requirements
+## SKILL.md requirements (claw-config-specific)
 
 - Clear `description` that triggers on user intent.
 - Interface includes:
-  - default mode does the job (plan-only)
-  - apply is a follow-up step (explicit confirm)
-- Guardrails:
+  - default mode does the job in **plan-only**
+  - apply is a **follow-up step** (user replies `apply`) + final yes/no
+- Guardrails must include:
   - docs-first
-  - routing vs activation
-  - rollback
+  - routing vs activation (if relevant)
+  - rollback pointer
+  - verification steps
+  - post-change report format (what / verify / effective / risk)
 - Doc pointers using `${OPENCLAW_REPO:-~/repo/apps/openclaw}`
 
 ## README requirements (human-facing)

@@ -1,6 +1,6 @@
 # claw-config-skill-creator
 
-This skill helps you **draft and review** OpenClaw skills intended for a "claw-config" agent (an agent whose job is to safely manage OpenClaw configuration).
+This skill helps you **draft and review** OpenClaw skills intended for a "claw-config" agent (a conservative config operator with change control and docs-first diagnosis).
 
 ## Why you want this
 

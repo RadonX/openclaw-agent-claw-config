@@ -11,7 +11,7 @@ metadata:
 
 # claw-config-skill-creator
 
-A blueprint skill for creating **safe, docs-first** skills used by agents that manage OpenClaw configuration.
+A blueprint skill for creating **claw-config-specific** skills: conservative config operations with docs-first diagnosis, change control, and consistency guarantees.
 
 ## Interface
 
@@ -79,14 +79,19 @@ Created skills must point to official docs using a portable repo-root placeholde
 ## Guardrails (non-negotiable)
 
 - **Docs-first** for deep issues. No guessing.
+- **Claw-config boundaries**: stay in config + ops; keep secrets redacted by default.
+- **Plan-first defaults**: for any skill that can change config, default behavior must be plan/proposal; apply must be a gated follow-up step.
+- **Rollback + verification + report**: require rollback pointer and a post-change report (what/verify/effective/risk).
 - **Public hygiene**: no private absolute paths; no version-sensitive routing logic copied into skills—link to docs instead.
-- **Plan-first defaults**: for any skill that can change config, default behavior must be plan/proposal; apply must be gated with explicit confirmation.
-- **Rollback**: require a rollback point (git commit or timestamp backup) before applying.
 
-## References
+## References (must-read)
 
-- `references/HELP.md`
+- `references/ROLE_AND_BOUNDARIES.md`
+- `references/CHANGE_WORKFLOW.md`
+- `references/TOOLING_AND_SECURITY_MODEL.md`
+- `references/ARCHETYPES.md`
+- `references/DOCS_FIRST_INDEX.md`
 - `references/CREATE_TEMPLATE.md`
 - `references/REVIEW_CHECKLIST.md`
 - `references/PUBLIC_HYGIENE.md`
-- `references/DOCS_FIRST_INDEX.md`
+- `references/HELP.md`

@@ -10,11 +10,13 @@
 - [ ] Routing (`bindings`) is separated from activation (`channels.*`).
 - [ ] Telegram: mentions/allowlists/topic overrides are acknowledged.
 
-## C) Safety defaults
+## C) Safety defaults (claw-config)
 
 - [ ] Default action is plan/proposal, not silent apply.
-- [ ] Apply requires explicit confirmation.
-- [ ] Rollback plan is present (git commit / backup).
+- [ ] Apply is a follow-up step (`apply`) + final yes/no.
+- [ ] Rollback pointer is present (git commit hash / backup file).
+- [ ] Verification steps are explicit (doctor/validate + restart + minimal runtime test).
+- [ ] Post-change report format exists (what/verify/effective/risk).
 
 ## D) Public readiness
 
