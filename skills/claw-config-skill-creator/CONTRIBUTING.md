@@ -7,7 +7,7 @@ This skill is meant to improve safety and predictability. Keep it short, strict,
 - Prefer official docs over folklore.
 - Separate routing (`bindings`) from activation (`channels.*`).
 - Do not add auto-apply behavior without explicit confirmation and rollback guidance.
-- Keep public docs path-portable (`${OPENCLAW_REPO:-~/repo/apps/openclaw}`) and avoid private absolute paths.
+- Keep public docs/path references portable and avoid private absolute paths.
 
 ## Submitting changes
 

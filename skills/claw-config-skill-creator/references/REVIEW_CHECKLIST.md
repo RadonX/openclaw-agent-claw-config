@@ -21,7 +21,6 @@
 ## D) Public readiness
 
 - [ ] No private absolute paths.
-- [ ] Uses `${OPENCLAW_REPO:-~/repo/apps/openclaw}` placeholder.
 - [ ] README explains user value, not implementation.
 
 ## E) Minimalism

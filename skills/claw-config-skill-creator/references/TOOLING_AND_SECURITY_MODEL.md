@@ -17,9 +17,11 @@ A claw-config skill must diagnose by reading docs and identifying the correct la
 
 ## Docs-first pointers
 
-- `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/tools/exec.md`
-- `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/tools/exec-approvals.md`
-- `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/tools/elevated.md`
+Do not hardcode doc links here. Use the docs-first protocol:
+
+- search official docs for the exact tool/key/error
+- confirm in source if version-sensitive
+- validate with a minimal repro
 
 ## Design requirements for skills
 

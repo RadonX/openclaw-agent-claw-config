@@ -2,7 +2,7 @@
 
 ## Must
 
-- Use portable doc paths: `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/...`
+- Keep doc/path references portable (no private absolute paths).
 - Keep `SKILL.md` as a router (short). Put detail in `references/`.
 - Keep README human-oriented: why someone wants this skill.
 

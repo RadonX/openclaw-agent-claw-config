@@ -37,9 +37,9 @@ Optional (add depending on archetype):
   - verification steps
   - post-change report format (what / verify / effective / risk)
 - Docs-first section must be minimal:
-  - link only the relevant official entry points for this skill
-  - include a discovery method (rg in docs/src) instead of listing everything
-  - use `${OPENCLAW_REPO:-~/repo/apps/openclaw}` or `https://docs.openclaw.ai`
+  - do **not** paste a doc list
+  - include a discovery method (search docs by key/error; then source; then validate)
+  - keep paths portable (no private absolute paths)
 
 ## README requirements (human-facing)
 

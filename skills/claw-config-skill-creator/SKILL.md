@@ -1,10 +1,10 @@
 ---
 name: claw-config-skill-creator
-description: Create or review OpenClaw skills for the claw-config agent. Default mode drafts a new skill (proposal-only) with docs-first mental model and safety guardrails; review mode audits an existing skill for routing/activation correctness, public hygiene, and apply-gating.
+description: Create or review OpenClaw skills for the claw-config agent. Default mode drafts a new skill (proposal-only) with docs-first diagnosis, change control, and claw-config safety constraints; review mode audits an existing skill for correctness and safety.
 compatibility: OpenClaw
 metadata:
   author: claw-config
-  version: "1.0"
+  version: "1.1"
   openclaw:
     emoji: "🧱"
 ---
@@ -36,7 +36,7 @@ Outputs a review report: issues, risks, and concrete edits.
 - First token after `/claw-config-skill-creator` is either:
   - `review`, or
   - `<new-skill-name>`
-- Any other subcommand-like token is unsupported → show help (in `references/HELP.md`) and ask the user to restate.
+- Any other token is unsupported → show help (in `references/HELP.md`) and ask the user to restate.
 
 ## Output contract
 
@@ -64,19 +64,19 @@ Must output:
 A claw-config skill must clearly separate:
 
 - **Routing**: `bindings` chooses which agent receives a message.
-- **Activation / access**: `channels.*` gates whether replies happen (Telegram requireMention/allowFrom/groupPolicy/topics overrides).
+- **Activation / access**: `channels.*` gates whether replies happen (mentions/allowlists/topic overrides, etc.).
 
-## Docs-first (don’t hardcode a doc list)
+## Docs-first (no fixed doc lists)
 
-Created skills should **not** copy a long list of OpenClaw docs.
+Created skills should **not** embed a curated list of docs pages.
 
-Instead, they must include a short “Docs-first” section that:
+Instead, they must include a short Docs-first protocol:
 
-- links to the *few* relevant official entry points for that skill’s archetype (routing vs telegram vs exec, etc.)
-- uses portable paths like `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/...` or links to `https://docs.openclaw.ai`
-- states a discovery method for deeper dives (e.g. search/grep in the repo) rather than enumerating everything
+- Start from official docs.
+- Find the right page by searching for the **exact config keys / error strings** involved.
+- If docs are ambiguous or version-sensitive, confirm in source and validate with a minimal repro.
 
-See: `references/DOCS_FIRST_INDEX.md` for the canonical index + how to use it.
+A good skill teaches *how to discover the right doc*, not which doc to memorize.
 
 ## Guardrails (non-negotiable)
 
@@ -84,7 +84,7 @@ See: `references/DOCS_FIRST_INDEX.md` for the canonical index + how to use it.
 - **Claw-config boundaries**: stay in config + ops; keep secrets redacted by default.
 - **Plan-first defaults**: for any skill that can change config, default behavior must be plan/proposal; apply must be a gated follow-up step.
 - **Rollback + verification + report**: require rollback pointer and a post-change report (what/verify/effective/risk).
-- **Public hygiene**: no private absolute paths; no version-sensitive routing logic copied into skills—link to docs instead.
+- **Public hygiene**: no private absolute paths; no version-sensitive routing logic copied into skills—link to official docs instead.
 
 ## References (must-read)
 
@@ -92,7 +92,6 @@ See: `references/DOCS_FIRST_INDEX.md` for the canonical index + how to use it.
 - `references/CHANGE_WORKFLOW.md`
 - `references/TOOLING_AND_SECURITY_MODEL.md`
 - `references/ARCHETYPES.md`
-- `references/DOCS_FIRST_INDEX.md`
 - `references/CREATE_TEMPLATE.md`
 - `references/REVIEW_CHECKLIST.md`
 - `references/PUBLIC_HYGIENE.md`
