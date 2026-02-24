@@ -2,7 +2,11 @@
 
 This is the minimal template the creator should instantiate.
 
-## Suggested file tree
+## Suggested file tree (archetype-specific)
+
+The tree is intentionally small. Add references **only when they add decision-making value**.
+
+Base skeleton:
 
 ```
 <new-skill-name>/
@@ -13,6 +17,12 @@ This is the minimal template the creator should instantiate.
     PROCESS.md
     CHECKLISTS.md
 ```
+
+Optional (add depending on archetype):
+
+- `references/ARCHITECTURE.md` (mental model diagrams / key invariants)
+- `references/PLAYBOOK.md` (incident-style step-by-step)
+- `references/EXAMPLES.md` (only if they prevent repeated mistakes; avoid dead pointers)
 
 ## SKILL.md requirements (claw-config-specific)
 
@@ -26,7 +36,10 @@ This is the minimal template the creator should instantiate.
   - rollback pointer
   - verification steps
   - post-change report format (what / verify / effective / risk)
-- Doc pointers using `${OPENCLAW_REPO:-~/repo/apps/openclaw}`
+- Docs-first section must be minimal:
+  - link only the relevant official entry points for this skill
+  - include a discovery method (rg in docs/src) instead of listing everything
+  - use `${OPENCLAW_REPO:-~/repo/apps/openclaw}` or `https://docs.openclaw.ai`
 
 ## README requirements (human-facing)
 

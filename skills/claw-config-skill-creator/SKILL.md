@@ -66,15 +66,17 @@ A claw-config skill must clearly separate:
 - **Routing**: `bindings` chooses which agent receives a message.
 - **Activation / access**: `channels.*` gates whether replies happen (Telegram requireMention/allowFrom/groupPolicy/topics overrides).
 
-## Docs-first index (portable paths)
+## Docs-first (don’t hardcode a doc list)
 
-Created skills must point to official docs using a portable repo-root placeholder:
+Created skills should **not** copy a long list of OpenClaw docs.
 
-- `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/channel-routing.md`
-- `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/telegram.md`
-- `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/tools/exec.md`
-- `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/tools/exec-approvals.md`
-- `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/tools/elevated.md`
+Instead, they must include a short “Docs-first” section that:
+
+- links to the *few* relevant official entry points for that skill’s archetype (routing vs telegram vs exec, etc.)
+- uses portable paths like `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/...` or links to `https://docs.openclaw.ai`
+- states a discovery method for deeper dives (e.g. search/grep in the repo) rather than enumerating everything
+
+See: `references/DOCS_FIRST_INDEX.md` for the canonical index + how to use it.
 
 ## Guardrails (non-negotiable)
 

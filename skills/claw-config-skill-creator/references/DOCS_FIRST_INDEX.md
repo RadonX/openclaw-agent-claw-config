@@ -1,23 +1,33 @@
-# Docs-first index (portable)
+# Docs-first index (portable, minimal)
 
-Use `${OPENCLAW_REPO:-~/repo/apps/openclaw}` as the repo-root placeholder in public docs.
+This is a **small set of official entry points**, not an exhaustive list.
 
-## Routing + session keys
+Use either:
 
+- Hosted docs: https://docs.openclaw.ai
+- Local docs (portable repo root): `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/...`
+
+## The 3 entry points (cover most claw-config deep dives)
+
+1) **Routing semantics / session keys**
 - `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/channel-routing.md`
 
-## Telegram activation gates
-
+2) **Telegram activation gates** (why the bot does / doesn’t reply)
 - `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/channels/telegram.md`
 
-## Exec / approvals / elevated
-
+3) **Exec policy / approvals / elevated** (why commands are blocked)
 - `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/tools/exec.md`
 - `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/tools/exec-approvals.md`
 - `${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs/tools/elevated.md`
 
-## How to use this index
+## Discovery method (when the entry points aren’t enough)
 
-- If a deep issue involves routing, start with channel-routing.
-- If it involves “bot not replying”, start with telegram activation gates.
-- If it involves approvals, stop guessing: read exec + exec-approvals + elevated.
+Do not guess. Use docs-first, then code:
+
+- Search docs by keyword:
+  - `rg -n "<keyword>" ${OPENCLAW_REPO:-~/repo/apps/openclaw}/docs`
+
+- If behavior is version-sensitive, locate the resolver/implementation:
+  - `rg -n "resolve.*route|bindings" ${OPENCLAW_REPO:-~/repo/apps/openclaw}/src`
+
+The skill you generate should include only the *relevant* entry points for its archetype, plus the discovery method above.
