@@ -176,7 +176,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="tg_user.py", description="High-risk MTProto user automation (Telethon).")
     p.add_argument(
         "--session",
-        default=str(Path(__file__).with_suffix(".session")),
+        default=str(Path.home() / ".openclaw/telegram-sync.session"),
         help="Session file path (keep it private).",
     )
 

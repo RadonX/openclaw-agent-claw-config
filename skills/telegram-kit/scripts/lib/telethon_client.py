@@ -26,6 +26,13 @@ def connect_client(*, session_path: str) -> "TelegramClient":
     if not all([api_id, api_hash, phone]):
         sys.exit("Missing TG_API_ID, TG_API_HASH, or TG_PHONE in ~/.openclaw/.env")
 
+    # Check if session file exists and is suspiciously small (likely corrupted)
+    import os
+    session_file = Path(session_path)
+    if session_file.exists() and session_file.stat().st_size < 100:
+        print(f"WARNING: Session file at {session_path} exists but is suspiciously small ({session_file.stat().st_size} bytes).", file=sys.stderr)
+        print("This usually means it is corrupted or expired. Deleting it may fix the issue.", file=sys.stderr)
+
     client = TelegramClient(session_path, int(str(api_id).strip()), str(api_hash).strip())
     return client, str(phone).strip(), password
 
