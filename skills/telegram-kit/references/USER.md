@@ -68,6 +68,5 @@ Options:
 
 ## Notes
 
-- **Session File Issues**: If you see `Please enter your phone (or bot token)` but credentials are correct, the session file (e.g., `tg_user.session`) may be corrupted or expired. Try deleting the session file and re-authenticating, or use a known valid session file (e.g., `telegram-sync.session`). The script has been updated to check for suspiciously small session files and print a warning.
 - Forum enable requires Telethon API that currently needs `tabs` param; the script handles this.
 - If you see “attempt was blocked”, cool down and confirm via Telegram security prompts.
