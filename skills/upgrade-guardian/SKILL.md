@@ -11,37 +11,108 @@ This skill defines a formal, multi-phase cognitive protocol for an agent to exec
 
 ## Core Principle
 
-An application upgrade is a high-stakes event. The agent must not trust that the upgrade is safe. The agent must assume that any change can have unintended consequences on a stable configuration. The goal is to make implicit environmental assumptions explicit and resilient before they break.
+An application upgrade is a high-stakes event. The agent must not trust that the upgrade is safe. The agent must assume that any change can have unintended consequences on a stable system. The goal is to make implicit environmental assumptions explicit and resilient before they break.
 
 ## Protocol Activation
 
 This protocol is activated when a human operator declares their intent to upgrade the application (e.g., "We are planning to upgrade OpenClaw from vA to vB").
 
-## Phase 1: Information Gathering & Hypothesis
+## Analysis Scope
 
-1.  **Ingest Release Notes:** Fetch the `CHANGELOG` or release notes for the target version range.
-2.  **Semantic Analysis:** Perform a semantic analysis of the notes. Do not just search for "breaking change." Instead, use the patterns in `references/changelog_analysis_patterns.md` to identify changes that imply a shift in default behavior or internal logic.
-3.  **Cross-Reference with Live Configuration:** Load the current `openclaw.json` into context. For every identified change, formulate a primary hypothesis by asking: **"Does our current configuration rely on an implicit behavior that this change might affect?"**
+Upgrade Guardian covers **two categories of risks**:
+
+1. **Configuration-level risks**: Changes that affect `openclaw.json` or static config files
+   - Breaking changes in schema or validation
+   - Deprecated config fields
+   - New required config options
+   - Default value changes
+
+2. **Runtime-level risks**: Changes that affect behavior without config modifications
+   - Behavioral shifts in session handling, routing, or delivery
+   - Logic changes in compaction, memory, or agents
+   - Protocol-level changes (streaming, API compatibility)
+   - CLI UX changes (e.g., `/new` behavior)
+
+See `references/RISK_CATEGORIES.md` for detailed taxonomy.
+
+## Phase 1: Information Gathering & Semantic Analysis
+
+1. **Ingest Release Notes**: Fetch the `CHANGELOG` or release notes for the target version range.
+2. **Semantic Analysis**: Perform semantic analysis using patterns in `references/CHANGELOG_PATTERNS.md`.
+   - Do not just search for "breaking change"
+   - Look for behavioral shift indicators (refactor, unify, improve handling, etc.)
+   - Identify both config-affecting and runtime-only changes
+3. **Cross-Reference with Environment**:
+   - **For config risks**: Load `openclaw.json` and identify dependencies on implicit behaviors
+   - **For runtime risks**: Identify active workflows (cron jobs, TUI usage, session routing patterns) that may be affected
 
 ## Phase 2: Risk Assessment & Scenario Planning
 
-1.  **Formulate "What-If" Scenarios:** Based on your hypotheses, generate concrete, testable failure scenarios.
-    *   *Example A:* "What if 'improved session handling' means a new, destructive default for unconfigured session types? This would lead to data loss."
-    *   *Example B:* "What if 'refactored security policy' means the `allowlist` now requires explicit IP ranges we haven't defined? This would lead to all plugin executions failing."
-2.  **Quantify Risk:** Assign a risk score to each scenario based on **Impact** (e.g., data loss > temporary outage) and **Likelihood** (e.g., direct config overlap > tangential relation).
-3.  **Generate Audit Report:** Present your analysis to the operator. This is not a pass/fail output. It is a strategic brief outlining potential risks and their predicted consequences.
+### 2.1 Formulate "What-If" Scenarios
 
-    **Template for Audit Report:**
-    > "Operator, I have analyzed the upcoming upgrade to `<VERSION>`. I have identified `<N>` potential breaking changes based on our current configuration.
-    >
-    > **High Risk #1: <Scenario Name>**
-    > *   **Evidence:** The changelog states: '`<Quote from changelog>`'.
-    > *   **Our Vulnerability:** Our configuration file (`openclaw.json`) at path `<jq path>` relies on an implicit default that may change.
-    > *   **Predicted Failure:** `<Description of the failure mode>`."
+For each identified change, generate concrete, testable failure scenarios:
 
-## Phase 3: Proactive Mitigation & Verification
+**Config-level examples:**
+- *Scenario A*: "What if 'improved session handling' means a new, destructive default for unconfigured session types? → Data loss."
+- *Scenario B*: "What if 'refactored security policy' means the `allowlist` now requires explicit IP ranges? → Plugin executions fail."
 
-1.  **Propose Configuration Hardening:** For each high-risk scenario, propose specific, proactive changes to `openclaw.json`. The goal is to make the configuration more resilient by making implicit assumptions explicit. Do not execute these changes without operator approval.
-2.  **Define a Verification Plan:** For each identified risk, define a clear, simple test to be run immediately post-upgrade to confirm the system is behaving as expected.
-    *   *Example:* "After the upgrade, we must immediately send a message in a `group` chat, wait one hour, and then verify the session file's `updatedAt` timestamp has not been reset."
-3.  **Post-Upgrade Audit:** After the operator confirms the upgrade is complete, execute the verification plan and report the results.
+**Runtime-level examples:**
+- *Scenario C*: "What if 'duplicate reply suppression' changes session routing logic? → Bot stops responding in some groups."
+- *Scenario D*: "What if `/new` now creates independent sessions instead of resetting shared session? → User workflow disrupted."
+- *Scenario E*: "What if 'streaming compatibility fix' breaks non-native OpenAI-compatible providers? → Long responses fail mid-stream."
+
+### 2.2 Quantify Risk
+
+Assign a risk score based on:
+- **Impact**: data loss > service outage > UX friction > cosmetic
+- **Likelihood**: direct config/workflow overlap > tangential relation > theoretical
+
+### 2.3 Generate Audit Report
+
+Present findings to the operator using the template in `references/AUDIT_REPORT_TEMPLATE.md`.
+
+**Key sections:**
+- Configuration risks (with jq paths and explicit mitigations)
+- Runtime risks (with behavioral descriptions and verification tests)
+- Risk prioritization (High/Medium/Low)
+
+## Phase 3: Mitigation & Verification
+
+### 3.1 Proactive Mitigation
+
+**For config risks**: Propose specific `openclaw.json` changes to make implicit assumptions explicit. Do not execute without operator approval.
+
+**For runtime risks**: Document expected behavioral changes and suggest workflow adjustments if needed.
+
+### 3.2 Verification Plan
+
+Define clear, simple tests for each risk:
+
+**Config verification examples:**
+- "Run `openclaw doctor` and confirm no validation errors"
+- "Check `gateway.err.log` for auth mode complaints"
+
+**Runtime verification examples:**
+- "Send test message in group chat, verify bot responds"
+- "Open TUI, run `/new`, confirm it creates independent session"
+- "Trigger long completion from streaming provider, verify no mid-stream failure"
+
+### 3.3 Post-Upgrade Audit
+
+After the operator confirms upgrade is complete:
+1. Execute verification plan
+2. Report results systematically
+3. Recommend rollback if critical failures detected
+
+## References
+
+- `references/CHANGELOG_PATTERNS.md` - Semantic analysis patterns
+- `references/RISK_CATEGORIES.md` - Detailed risk taxonomy
+- `references/AUDIT_REPORT_TEMPLATE.md` - Report structure
+- `references/VERIFICATION_CHECKLIST.md` - Common verification tests
+
+## Notes
+
+- This protocol is designed to be **conservative**. It's better to flag a false positive than miss a silent breaking change.
+- Runtime risks are often harder to detect than config risks. Pay extra attention to behavioral keywords like "improve", "fix", "refactor" in areas you actively use (sessions, routing, streaming).
+- When in doubt, ask the operator about their workflow patterns before deeming a risk "Low" priority.
