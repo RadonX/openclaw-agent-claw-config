@@ -421,3 +421,84 @@ echo "  - Verify session creation"
 ```
 
 Make it executable: `chmod +x post-upgrade-check.sh`
+
+---
+
+## Extended Monitoring (Post-Upgrade)
+
+### Setup monitoring before leaving upgrade unattended
+
+**Option 1: Quick Verification (5 minutes, recommended for most cases)**
+```bash
+# Run immediate checks after upgrade
+for i in {1..10}; do
+    echo "Check #$i - $(date)"
+    pgrep -f "gateway" && echo "✅ Gateway OK" || echo "⚠️  Gateway down!"
+    openclaw logs --since 1m 2>&1 | grep -qiE "error|streaming" && echo "⚠️  Issues found" || echo "✅ No issues"
+    sleep 30
+done
+```
+
+**Option 2: Extended Monitoring (24 hours, automated)**
+```bash
+# Create monitoring script
+cat > ~/openclaw-upgrade-monitor.sh <<'SCRIPT'
+#!/bin/bash
+LOG_FILE="$HOME/openclaw-upgrade-monitor.log"
+echo "=== Monitoring started at $(date) ===" >> "$LOG_FILE"
+
+# Check every 30 minutes for 24 hours (48 checks)
+for i in {1..48}; do
+    echo "Check #$i - $(date)" >> "$LOG_FILE"
+    
+    # Gateway status
+    pgrep -f "gateway" >/dev/null && echo "✅ Gateway OK" >> "$LOG_FILE" || echo "⚠️  Gateway down!" >> "$LOG_FILE"
+    
+    # Error check
+    ERROR_COUNT=$(openclaw logs --since 10m 2>&1 | grep -ci "error" || echo "0")
+    echo "Errors (last 10m): $ERROR_COUNT" >> "$LOG_FILE"
+    
+    # Streaming check
+    openclaw logs --since 10m 2>&1 | grep -qiE "parse error|streaming" && echo "⚠️  Streaming issues" >> "$LOG_FILE" || echo "✅ Streaming OK" >> "$LOG_FILE"
+    
+    echo "" >> "$LOG_FILE"
+    [ $i -lt 48 ] && sleep 1800  # 30 minutes
+done
+echo "=== Monitoring complete at $(date) ===" >> "$LOG_FILE"
+SCRIPT
+
+chmod +x ~/openclaw-upgrade-monitor.sh
+
+# Run in background
+nohup bash ~/openclaw-upgrade-monitor.sh &
+
+# Check results anytime
+tail -f ~/openclaw-upgrade-monitor.log
+```
+
+**Option 3: One-Shot Validation (recommended)**
+```bash
+# Verify immediately after upgrade, then manually check back in 24h
+echo "=== Post-Upgrade Check - $(date) ===" > ~/post-upgrade-check.txt
+openclaw status >> ~/post-upgrade-check.txt
+openclaw logs --since 5m 2>&1 | grep -iE "error|streaming" >> ~/post-upgrade-check.txt 2>&1 || echo "No issues" >> ~/post-upgrade-check.txt
+
+# Check back in 24 hours manually:
+# openclaw logs --since 24h | grep -iE "error|streaming"
+```
+
+### What to Monitor
+
+| Indicator | Command | Alert Threshold |
+|-----------|---------|-----------------|
+| Gateway crashes | `pgrep -f "gateway"` | Process not running |
+| Parse errors | `grep -c "parse error" logs` | Any occurrence |
+| Streaming errors | `grep -c "streaming" logs` | Any occurrence |
+| Auth errors | `grep -c "auth.*error" logs` | Any occurrence |
+| Session failures | `grep -c "session.*fail" logs` | > 5 per hour |
+
+### Summary
+
+- **Most users**: Use Option 1 (quick 5-min check) or Option 3 (one-shot + manual follow-up)
+- **Production systems**: Use Option 2 (24h automated monitoring)
+- **All options**: Check logs for `parse error`, `streaming`, `auth` keywords
