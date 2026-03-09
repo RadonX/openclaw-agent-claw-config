@@ -14,12 +14,42 @@ cd $HOME/repo/apps/openclaw && pnpm openclaw doctor
 # 2. Verify config validity
 openclaw config validate
 
-# 3. Create backup
-openclaw backup create --only-config
+# 3. Create config-only backup (lightweight, ~16MB)
+# Note: Backup CLI does not auto-cleanup. Manage retention manually.
+openclaw backup create --only-config --verify
+
+# Alternative: Full backup including sessions (~5GB)
+# openclaw backup create --verify
 
 # 4. Document current state
 openclaw status > /tmp/pre-upgrade-status.txt
 git -C $HOME/repo/apps/openclaw log -1 > /tmp/pre-upgrade-version.txt
+```
+
+#### Backup Management
+
+**Important**: `openclaw backup create` does not auto-cleanup old backups. To avoid disk space issues:
+
+**Option 1: Config-Only Backups (Recommended for Upgrade Guardian)**
+```bash
+# Only backup config (16MB vs 5GB for full backup)
+openclaw backup create --only-config --verify
+```
+
+**Option 2: Manual Cleanup for Full Backups**
+```bash
+# Keep only last 7 backups (if using full backups)
+ls -t ~/Backups/openclaw/*.tar.gz | tail -n +8 | xargs rm -f
+
+# Or use find to delete backups older than 7 days
+find ~/Backups/openclaw -name "*.tar.gz" -mtime +7 -delete
+```
+
+**Option 3: Dedicated Backup Directory**
+```bash
+# Create organized backup location
+mkdir -p ~/Backups/openclaw
+openclaw backup create --only-config --output ~/Backups/openclaw --verify
 ```
 
 ---
