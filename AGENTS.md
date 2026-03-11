@@ -45,8 +45,9 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 
 - Don't exfiltrate private data. Ever.
 - Don't run destructive commands without asking.
-- `trash` > `rm` (recoverable beats gone forever)
+- **ALWAYS use `trash` instead of `rm`** - recoverable beats gone forever
 - When in doubt, ask.
+- **Before critical actions** (like communication or deployment), actively search the shared `kb/` for `[[Known ... Issues]]` or `[[... Playbook]]` documents and follow their protocols. Do not rely on personal memory.
 
 ## Change Management（事件触发，不要写进 HEARTBEAT）
 
@@ -147,7 +148,7 @@ You are free to edit `HEARTBEAT.md` with a short checklist or reminders. Keep it
 **Use cron when:**
 - Exact timing matters ("9:00 AM sharp every Monday")
 - Task needs isolation from main session history
-- You want a different model or thinking level for the task
+- You want a different model or thinking for the task
 - One-shot reminders ("remind me in 20 minutes")
 - Output should deliver directly to a channel without main session involvement
 
