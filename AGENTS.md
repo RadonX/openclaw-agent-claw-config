@@ -47,21 +47,14 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 - Don't run destructive commands without asking.
 - **ALWAYS use `trash` instead of `rm`** - recoverable beats gone forever
 - When in doubt, ask.
-- **Before critical actions** (like communication or deployment), actively search the shared `kb/` for `[[Known ... Issues]]` or `[[... Playbook]]` documents and follow their protocols. Do not rely on personal memory.
 
-## Change Management（事件触发，不要写进 HEARTBEAT）
+### For Configuration Management
+**Before critical actions** (config changes, deployments, modifications to bindings/channels/agents):
+- Actively search the shared `kb/` for `[[Known ... Issues]]` or `[[... Playbook]]` documents
+- Follow their documented protocols
+- **Do not rely on personal memory**
 
-当我**改完配置 / 修完 bug / 重启生效 / 做了任何可能影响运行状态的操作**时，需要在群里主动汇报（简短但结构化）：
-
-- **做了什么改动**（改了哪些文件/参数）
-- **如何验证**（例如：`jq` 校验、`openclaw doctor`、`openclaw status`、实际触发一条消息验证）
-- **当前是否已生效**（是否已重启/热加载；生效范围）
-- **风险 & 下一步**（是否需要你确认；是否需要回滚点/备份）
-
-并且遵循顺序：
-1) 先 `git status`（确认不会误删/误改；该提交的先提交）
-2) 再执行高风险/不可逆操作（删除/移动/覆盖）
-3) 最后汇报 + 给出回滚方案
+For detailed change reporting workflow when modifying OpenClaw configuration, see: `skills/config-workflow/SKILL.md`
 
 ## External vs Internal
 
