@@ -38,7 +38,7 @@ See `references/RISK_CATEGORIES.md` for detailed taxonomy.
 ## Phase 1: Information Gathering & Semantic Analysis
 
 1. **Ingest Release Notes**: Fetch the `CHANGELOG` or release notes for the target version range.
-2. **Semantic Analysis**: Perform semantic analysis using patterns in `references/CHANGELOG_PATTERNS.md`.
+2. **Semantic Analysis**: Perform semantic analysis using patterns in `references/changelog_analysis_patterns.md`.
    - Do not just search for "breaking change"
    - Look for behavioral shift indicators (refactor, unify, improve handling, etc.)
    - Identify both config-affecting and runtime-only changes
@@ -104,9 +104,21 @@ After the operator confirms upgrade is complete:
 2. Report results systematically
 3. Recommend rollback if critical failures detected
 
+### 3.4 Archive Upgrade Artifacts (relative to workspace)
+
+Save the upgrade write-ups and check results **inside the agent workspace** so they remain discoverable and portable.
+
+**Write locations (relative paths):**
+- Pre-upgrade analysis report → `kb/logs/upgrade-reports/YYYY-MM-DD_<from>-to-<to>_upgrade-analysis.md`
+- Post-upgrade verification report → `kb/logs/upgrade-verifications/YYYY-MM-DD_post-upgrade-verification.txt`
+
+Notes:
+- Prefer **workspace-relative paths** in reports (avoid hard-coded absolute home paths).
+- If `kb/` is a symlink in a particular deployment, still refer to it as `kb/...` in the protocol/report; the filesystem mapping is an implementation detail.
+
 ## References
 
-- `references/CHANGELOG_PATTERNS.md` - Semantic analysis patterns
+- `references/changelog_analysis_patterns.md` - Semantic analysis patterns
 - `references/RISK_CATEGORIES.md` - Detailed risk taxonomy
 - `references/AUDIT_REPORT_TEMPLATE.md` - Report structure
 - `references/VERIFICATION_CHECKLIST.md` - Common verification tests
