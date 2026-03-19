@@ -85,8 +85,18 @@ if [[ ! -d "$SESSIONS_DIR" ]]; then
 fi
 
 # Resolve source session file
-SOURCE_FILE="$SESSIONS_DIR/$SOURCE_ID.jsonl"
+# Support .jsonl.reset.<timestamp> archive files as source
 FUZZY_MATCHED=false
+
+if [[ "$SOURCE_ID" == *.jsonl.reset.* ]]; then
+  # Direct archive file reference (no .jsonl suffix needed)
+  SOURCE_FILE="$SESSIONS_DIR/$SOURCE_ID"
+elif [[ -f "$SESSIONS_DIR/$SOURCE_ID" ]]; then
+  # Exact path match
+  SOURCE_FILE="$SESSIONS_DIR/$SOURCE_ID"
+else
+  SOURCE_FILE="$SESSIONS_DIR/$SOURCE_ID.jsonl"
+fi
 
 if [[ ! -f "$SOURCE_FILE" ]]; then
   MATCHES=($(ls "$SESSIONS_DIR/$SOURCE_ID"*.jsonl 2>/dev/null || true))
@@ -119,7 +129,17 @@ if [[ -z "$TARGET_ID" ]]; then
   exit 1
 fi
 
+# Target transcript file name differs for Telegram forum topics.
+# If the session key ends with :topic:<id>, the transcript is typically stored as:
+#   <sessionId>-topic-<topicId>.jsonl
+# Otherwise it is:
+#   <sessionId>.jsonl
 TARGET_FILE="$SESSIONS_DIR/$TARGET_ID.jsonl"
+if [[ "$TARGET_SESSION_KEY" =~ :topic:([0-9]+)$ ]]; then
+  TOPIC_ID="${BASH_REMATCH[1]}"
+  TARGET_FILE="$SESSIONS_DIR/${TARGET_ID}-topic-${TOPIC_ID}.jsonl"
+fi
+
 if [[ ! -f "$TARGET_FILE" ]]; then
   echo "Creating new target file..."
   mkdir -p "$(dirname "$TARGET_FILE")"
