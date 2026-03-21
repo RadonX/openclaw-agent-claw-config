@@ -101,11 +101,33 @@ If restoring **another session** (not your own), single turn is fine:
 3. **Single Target** - One restoration per execution, no batch operations
 4. **Atomic Operation** - Use file operations that complete or fail entirely
 
+## Finding the Source Session
+
+When the user gives you a **keyword** (not a session ID), you must search **all** transcript files:
+
+```bash
+# CORRECT — searches .jsonl AND .jsonl.reset.* archives
+rg "关键词" ~/.openclaw/agents/<agent>/sessions/ --hidden --no-ignore -l
+
+# WRONG — misses .jsonl.reset.* files
+rg "关键词" ~/.openclaw/agents/<agent>/sessions/ --glob "*.jsonl"
+```
+
+When the user gives you a **session key** (e.g. `agent:ginmoni:main`), look up the current sessionId from `sessions.json`, **but also check for orphan `.reset` archives** — the key may have been reused and the old content archived:
+
+```bash
+# Also search for orphan .reset files
+ls ~/.openclaw/agents/<agent>/sessions/*.reset.*
+```
+
+**Rule: Always include `.jsonl.reset.*` files in any session search.** They contain previously active sessions that were reset, and are often the actual content the user wants restored.
+
 ## Session Structure
 
 **Key Files:**
 - `sessions.json` - Session index (maps session keys → session IDs)
 - `<session-id>.jsonl` - Conversation history (JSON Lines format)
+- `<session-id>.jsonl.reset.<timestamp>` - Archived transcript after session reset
 - `.jsonl` files self-contained; sessions.json only stores metadata pointers
 
 **Session Key Format:**
