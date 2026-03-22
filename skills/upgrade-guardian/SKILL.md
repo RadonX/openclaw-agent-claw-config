@@ -1,6 +1,6 @@
 ---
 name: upgrade-guardian
-description: A cognitive protocol for an agent to safely manage and audit OpenClaw application upgrades, preventing silent breaking changes. Use when an operator announces an intent to upgrade the application.
+description: A cognitive protocol for safely managing and auditing OpenClaw application upgrades. Analyzes configuration-level risks (schema, defaults) and runtime-level behavioral shifts (routing, sessions, streaming) using semantic changelog analysis to prevent silent breaking changes.
 ---
 
 # Cognitive Protocol: The Upgrade Guardian
@@ -35,14 +35,33 @@ Upgrade Guardian covers **two categories of risks**:
 
 See `references/RISK_CATEGORIES.md` for detailed taxonomy.
 
+## ⛔ Hard Constraints (Read Before Doing Anything)
+
+**During Phase 1 (analysis), the working directory MUST NOT be modified.**
+
+- ✅ Allowed: `git fetch --tags --prune`, `git log origin/main`, `git diff HEAD origin/main`
+- ❌ Forbidden: `git pull`, `git merge`, `git rebase`, `git checkout`, `pnpm install`
+
+If you run `git pull` or `git rebase` during analysis, the new code becomes active on next gateway restart — **bypassing the human approval gate entirely**. This has happened in production (2026-03-22).
+
+Only run `git pull --ff-only` **after** explicit human approval ("proceed" / "允许升级") in Phase 3.
+
 ## Phase 1: Information Gathering & Semantic Analysis
 
-1. **Ingest Release Notes**: Fetch the `CHANGELOG` or release notes for the target version range.
-2. **Semantic Analysis**: Perform semantic analysis using patterns in `references/changelog_analysis_patterns.md`.
+1. **Read-only git setup**:
+   ```bash
+   git fetch --tags --prune   # ONLY allowed remote operation during analysis
+   CURRENT=$(git describe --tags --abbrev=0 HEAD)
+   LATEST=$(git tag --sort=-v:refname | grep -Ev '(beta|rc|alpha)' | head -n 1)
+   # Analyze: git log HEAD..origin/main, git diff HEAD origin/main -- path
+   # Do NOT run git pull/merge/rebase
+   ```
+2. **Ingest Release Notes**: Fetch the `CHANGELOG` or release notes for the target version range.
+3. **Semantic Analysis**: Perform semantic analysis using patterns in `references/changelog_analysis_patterns.md`.
    - Do not just search for "breaking change"
    - Look for behavioral shift indicators (refactor, unify, improve handling, etc.)
    - Identify both config-affecting and runtime-only changes
-3. **Cross-Reference with Environment**:
+4. **Cross-Reference with Environment**:
    - **For config risks**: Load `openclaw.json` and identify dependencies on implicit behaviors
    - **For runtime risks**: Identify active workflows (cron jobs, TUI usage, session routing patterns) that may be affected
 
