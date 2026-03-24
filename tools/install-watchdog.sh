@@ -13,7 +13,7 @@ set -euo pipefail
 
 WORKSPACE="${1:-${HOME}/.openclaw/workspace-claw-config}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PLIST_TEMPLATE="${SCRIPT_DIR}/../config/launchd/com.user.clawconfig.watchdog.plist.template"
+PLIST_TEMPLATE="${SCRIPT_DIR}/com.user.clawconfig.watchdog.plist.template"
 PLIST_DEST="${HOME}/Library/LaunchAgents/com.user.clawconfig.watchdog.plist"
 LABEL="com.user.clawconfig.watchdog"
 
