@@ -1,6 +1,14 @@
 ---
 name: telegram-kit
-description: Telegram provisioning toolkit that unifies a safe, Linus-style workflow for forum supergroups: (A) MTProto *user* API (high-risk) to create groups, enable forum, invite/promote bots; (B) Telegram Bot API (low-risk) to create forum topics and send messages. Use when setting up a new Telegram supergroup/forum for an OpenClaw agent, or when you need to create topics / verify/manage bot permissions. Strictly separate user vs bot operations.
+description: >-
+  Telegram group/forum provisioning and management. USE WHEN: inviting bots to
+  a group, promoting bots to admin, creating groups/forums, creating topics,
+  sending messages as user or bot, checking bot permissions. DON'T use raw
+  curl/Telegram API for these — this skill wraps safe Telethon (user) and Bot
+  API (bot) scripts. Also use when: you need to add/remove/manage members in a
+  Telegram group where you have admin rights. Triggers on: invite bot, add bot
+  to group, promote bot, create topic, telegram group setup, forum setup.
+  Safety: user API (MTProto) = high-risk, bot API = low-risk, never mix.
 ---
 
 # telegram-kit
