@@ -1,14 +1,11 @@
 ---
 name: telegram-kit
-description: >-
-  Telegram group/forum provisioning and management. USE WHEN: inviting bots to
-  a group, promoting bots to admin, creating groups/forums, creating topics,
-  sending messages as user or bot, checking bot permissions. DON'T use raw
-  curl/Telegram API for these — this skill wraps safe Telethon (user) and Bot
-  API (bot) scripts. Also use when: you need to add/remove/manage members in a
-  Telegram group where you have admin rights. Triggers on: invite bot, add bot
-  to group, promote bot, create topic, telegram group setup, forum setup.
-  Safety: user API (MTProto) = high-risk, bot API = low-risk, never mix.
-metadata:
-  author: claw-config
-  version: "1.1"
+version: "1.1"
+status: stable
+owner: claw-config
+created: 2026-02-10
+updated: 2026-03-27
+contract:
+  - "user API (MTProto) and bot API operations are strictly separated"
+  - "user API never runs unattended or in cron"
+  - "scripts run directly, never copy/paste code into chat"

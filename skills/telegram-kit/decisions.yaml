@@ -1,0 +1,7 @@
+---
+decisions:
+- id: telegram-kit-desc-20260327
+  date: 2026-03-27
+  model: mimo-v2-pro
+  decision: Rewrite telegram-kit description to explicitly list trigger operations
+  context: Agent repeatedly failed to recognize "invite bot to group" as a telegram-kit use case, fell back to raw curl
